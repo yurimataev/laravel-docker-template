@@ -19,6 +19,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./laravel-app:/var/www
+      - /var/www/vendor/
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
