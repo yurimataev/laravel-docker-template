@@ -4,7 +4,7 @@ services:
   #PHP Service
   app:
     build:
-      context: ./laravel-app
+      context: ./app
       dockerfile: ../Dockerfile
     image: yurimataev/laravel-app
     container_name: app
@@ -18,8 +18,7 @@ services:
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
-      - ./laravel-app:/var/www
-      - /var/www/vendor/
+      - ./app:/var/www
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
@@ -34,7 +33,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./laravel-app:/var/www
+      - ./app:/var/www
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - app-network

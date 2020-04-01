@@ -1,13 +1,12 @@
 # Laravel Docker Test
 
-Laravel development environment based on PHP-FPM, Nginx and MySQL, running out of Docker containers. This was done as `docker-compose` practice, use something like [Laradock](http://laradock.io/) for actual development.
+Laravel development environment based on PHP-FPM, Nginx and MySQL, running out of Docker containers. This was done as practice in using `docker-compose` and setting up a CI/CD pipeline; use something like [Laradock](http://laradock.io/) for actual development.
 
 ## Setup
 
-After cloning this repo, get the Laravel source code from the official repo by running:
+After cloning this repo, set up shop in the `app` folder using:
 
-    git submodule init
-    git submodule update
+    docker run --rm -v $(pwd):/app composer create-project laravel/laravel app
 
 Start everything with:
 

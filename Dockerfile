@@ -25,14 +25,10 @@ RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
 RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
 RUN docker-php-ext-install gd
 
-# Install composer, composer install
+# Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-COPY composer.* /var/www/
-RUN composer install --no-autoloader
-COPY . /var/www
-RUN composer dump-autoload
 
-# Add user for laravel application
+# Set ownership for appl
 RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 COPY --chown=www:www . /var/www
