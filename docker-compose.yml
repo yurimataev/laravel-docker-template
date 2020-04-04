@@ -1,15 +1,17 @@
 version: '3'
 services:
 
-  #PHP Service
+  #Combined Nginx & PHP
   app:
     build:
-      context: ./app
-      dockerfile: ../Dockerfile
+      context: .
+      dockerfile: Dockerfile
     image: yurimataev/laravel-app
     container_name: app
     restart: unless-stopped
     tty: true
+    ports:
+      - "8080:8080"
     environment:
       DB_HOST: ${DB_HOST}
       DB_DATABASE: ${DB_DATABASE}
@@ -20,22 +22,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./app:/var/www
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - app-network
-
-  #Nginx Service
-  webserver:
-    image: nginx:alpine
-    container_name: webserver
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./app:/var/www
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx-php/php.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./nginx-php/nginx.conf:/etc/nginx/conf.d/app.conf
     networks:
       - app-network
 

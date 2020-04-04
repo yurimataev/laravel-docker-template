@@ -18,6 +18,10 @@ Execute artisan commands using:
 
 You can tweak MySQL, Nginx and PHP settings in the settings files located in the respective directories.
 
+## Acknowledgements
+
+The unified PHP-FPM / Nginx Docker container was based on [docker-php-nginx](https://github.com/TrafeX/docker-php-nginx) by [Tim de Pater](https://github.com/TrafeX). Thanks to him for his work!
+
 ## License
 
 This code is made available under the [MIT license](https://opensource.org/licenses/MIT).

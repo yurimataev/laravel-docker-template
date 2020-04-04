@@ -1,41 +1,43 @@
-FROM php:7.2-fpm
+FROM alpine:3.11
 
-# Set working directory
-WORKDIR /var/www
-
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    git \
-    curl
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install extensions
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
-RUN docker-php-ext-install gd
+# Install packages
+RUN apk --no-cache add php7 php7-fpm php7-pdo php7-pdo_mysql php7-json php7-openssl php7-curl \
+    php7-zlib php7-xml php7-phar php7-intl php7-dom php7-xmlreader php7-ctype php7-session \
+    php7-mbstring php7-gd nginx supervisor curl
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set ownership for app
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
-COPY --chown=www:www . /var/www
-USER www
+# Configure nginx
+COPY nginx-php/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 9000
-EXPOSE 9000
+# Configure PHP-FPM
+COPY nginx-php/php-fpm.conf /etc/php7/php-fpm.d/www.conf
+COPY nginx-php/php.ini /etc/php7/conf.d/custom.ini
 
-# Run composer install and start php-fpm
-CMD ["php-fpm"]
+# Configure supervisord
+COPY nginx-php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Setup document root
+RUN mkdir -p /var/www
+RUN mkdir -p /run/nginx
+
+# Make sure files/folders needed by the processes are accessable when they run under the nobody user
+RUN chown -R nobody.nobody /var/www && \
+  chown -R nobody.nobody /run && \
+  chown -R nobody.nobody /var/lib/nginx && \
+  chown -R nobody.nobody /var/log/nginx
+
+# Switch to use a non-root user from here on
+USER nobody
+
+# Copy the app into document root
+# Irrelevant in the dev environment, necessary for production
+WORKDIR /var/www
+COPY --chown=nobody app/ /var/www/
+
+# Expose the port nginx is reachable on
+EXPOSE 8080
+
+# Let supervisord start nginx & php-fpm
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
