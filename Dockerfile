@@ -37,14 +37,14 @@ COPY app /var/www
 # Install composer dependencies
 RUN composer install
 
+# Copy .env.example to .env
+RUN cp /var/www/.env.example /var/www/.env
+
 # Make sure files/folders needed by the processes are accessable when they run under the nobody user
 RUN chown -R nobody.nobody /var/www && \
   chown -R nobody.nobody /run && \
   chown -R nobody.nobody /var/lib/nginx && \
   chown -R nobody.nobody /var/log/nginx
-
-# Copy .env.example to .env
-RUN cp /var/www/.env.example /var/www/.env
 
 # Switch to use a non-root user from here on
 USER nobody
